@@ -1,0 +1,82 @@
+## ============================
+## Visual Studio / MSBuild
+## ============================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+*.opensdf
+*.sdf
+
+## Dossiers de build (toutes configurations/plateformes)
+[Dd]ebug/
+[Dd]ebug[Pp]ublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+Win32/
+ARM/
+ARM64/
+[Bb]in/
+[Oo]bj/
+Out/
+
+## ============================
+## Compilation C/C++
+## ============================
+*.obj
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.exp
+*.idb
+*.tlog
+*.log
+*.pch
+*.ipch
+*.res
+*.map
+*.iobj
+*.ipdb
+
+## ============================
+## OpenCL
+## ============================
+# Cache de compilation des kernels OpenCL (le nom exact dépend du vendeur
+# de votre plateforme OpenCL — adaptez si besoin, ex: cache Intel/AMD/NVIDIA)
+*.clbin
+*.clcache/
+.cl_cache/
+
+## ============================
+## CMake (si jamais utilisé en complément du .sln)
+## ============================
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CMakeScripts/
+
+## ============================
+## OS / OneDrive
+## ============================
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+## ============================
+## Fichiers issus de Claude (pas du code source)
+## ============================
+Claude outputs/
+
+## ============================
+## Divers
+## ============================
+*.bak
+*~
+*.tmp
