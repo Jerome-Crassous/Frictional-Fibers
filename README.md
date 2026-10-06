@@ -5,6 +5,8 @@ Univ Rennes, CNRS, IPR (Institut de Physique de Rennes) – UMR 6251, F-35000 Re
 PMMH, CNRS, ESPCI Paris, Université PSL, Sorbonne Université, Université de Paris, 75005 Paris, France  
 jerome.crassous@univ-rennes1.fr — [https://jerome-crassous.github.io/](https://jerome-crassous.github.io/)
 
+This project  has been supported by  Agence Nationale de la Recherche Grant ANR-23-CE30-0015.
+
 > *This documentation was written with the help of an artificial intelligence (Claude, Anthropic), based on the source code and the reference article.*
 
 <table align="center">
@@ -130,38 +132,38 @@ Two C structures (defined in `fiberLib_OpenCL_v9.6.h`) are handled on the host s
 
 ### The `fiber` structure (one per fiber)
 
-| Field | Role |
-|---|---|
-| `n` | number of nodes N of the fiber (hence N−1 segments) |
-| `status` | `STATUS_FREE` (dynamic fiber), `STATUS_FIXED` (immobile), `STATUS_VIRTUAL` ("padding" fiber, see I.7) |
-| `radius`, `l0`, `k0`, `masse`, `j` | cylinder radius, segment rest length, stretching stiffness, mass per node, moment of inertia |
-| `bending` ($B$), `c` ($C$) | bending modulus and twisting modulus |
-| `xt[i][3]`, `xtm[i][3]` | position of node $i$ at time $t$ and at the previous time $t-\Delta t$ (needed by the Verlet integrator) |
-| `thetat[i][3]`, `thetatm[i][3]` | only component `[2]` (the $e^i$ axis, stored as the local "z" component) is used: it is $\theta_i$ at $t$ and $t-\Delta t$ |
-| `e[i][3]` | tangent vector $e^i$ of segment $i$ (computed, not to be provided) |
-| `m1_bar[i][3]`, `m1[i][3]` | reference material frame (transported without twist) and actual material frame |
-| `kappa1_bar[i]`, `kappa2_bar[i]` | natural curvature of segment $i$ |
-| `f[i][3]`, `moment[i][3]` | force and moment accumulated on the node/segment (computed by the kernels) |
-| `flag[i]` | free integer, usable by the specific kernel to tag certain nodes (e.g. fabric edges) |
+| Field                              | Role                                                                                                                       |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `n`                                | number of nodes N of the fiber (hence N−1 segments)                                                                        |
+| `status`                           | `STATUS_FREE` (dynamic fiber), `STATUS_FIXED` (immobile), `STATUS_VIRTUAL` ("padding" fiber, see I.7)                      |
+| `radius`, `l0`, `k0`, `masse`, `j` | cylinder radius, segment rest length, stretching stiffness, mass per node, moment of inertia                               |
+| `bending` ($B$), `c` ($C$)         | bending modulus and twisting modulus                                                                                       |
+| `xt[i][3]`, `xtm[i][3]`            | position of node $i$ at time $t$ and at the previous time $t-\Delta t$ (needed by the Verlet integrator)                   |
+| `thetat[i][3]`, `thetatm[i][3]`    | only component `[2]` (the $e^i$ axis, stored as the local "z" component) is used: it is $\theta_i$ at $t$ and $t-\Delta t$ |
+| `e[i][3]`                          | tangent vector $e^i$ of segment $i$ (computed, not to be provided)                                                         |
+| `m1_bar[i][3]`, `m1[i][3]`         | reference material frame (transported without twist) and actual material frame                                             |
+| `kappa1_bar[i]`, `kappa2_bar[i]`   | natural curvature of segment $i$                                                                                           |
+| `f[i][3]`, `moment[i][3]`          | force and moment accumulated on the node/segment (computed by the kernels)                                                 |
+| `flag[i]`                          | free integer, usable by the specific kernel to tag certain nodes (e.g. fabric edges)                                       |
 
 ### The `parameter` structure (global simulation parameters)
 
 The most commonly used fields:
 
-| Field | Role |
-|---|---|
-| `dt` | time step $\Delta t$ |
-| `kn`, `kt` | normal and tangential contact stiffnesses |
-| `lambda` | global (transverse) viscous damping, $f^{visc} = -\lambda \dot r$ |
-| `lambda_internal` | viscous damping of stretching (longitudinal) |
-| `lambda_contact_n`, `lambda_contact_t` | viscous contact damping (normal/tangential) |
-| `mu` | Coulomb friction coefficient |
-| `nFiber`, `nSegment` | number of fibers, total number of segments (computed) |
-| `nContactMax` | size of the contact list (must be a multiple of `WG`, see Part II) |
-| `epsStar` | distance threshold for potential-contact search (self-adjusted, see II.5) |
-| `periodic` | `PERIODIC_NO`, `PERIODIC_XY`, ... periodic boundary conditions |
-| `bending`, `c` | default values of $B$ and $C$ (often copied into each `fiber`) |
-| `iter`, `iterStop` | iteration counter and stopping iteration |
+| Field                                     | Role                                                                                                                        |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `dt`                                      | time step $\Delta t$                                                                                                        |
+| `kn`, `kt`                                | normal and tangential contact stiffnesses                                                                                   |
+| `lambda`                                  | global (transverse) viscous damping, $f^{visc} = -\lambda \dot r$                                                           |
+| `lambda_internal`                         | viscous damping of stretching (longitudinal)                                                                                |
+| `lambda_contact_n`, `lambda_contact_t`    | viscous contact damping (normal/tangential)                                                                                 |
+| `mu`                                      | Coulomb friction coefficient                                                                                                |
+| `nFiber`, `nSegment`                      | number of fibers, total number of segments (computed)                                                                       |
+| `nContactMax`                             | size of the contact list (must be a multiple of `WG`, see Part II)                                                          |
+| `epsStar`                                 | distance threshold for potential-contact search (self-adjusted, see II.5)                                                   |
+| `periodic`                                | `PERIODIC_NO`, `PERIODIC_XY`, ... periodic boundary conditions                                                              |
+| `bending`, `c`                            | default values of $B$ and $C$ (often copied into each `fiber`)                                                              |
+| `iter`, `iterStop`                        | iteration counter and stopping iteration                                                                                    |
 | `lx, ly, lz`, `R`, `RHelix`, `pitch`, ... | free geometric parameters, used as each case study sees fit (periodic box, radius of a winding cylinder, helix pitch, etc.) |
 
 Useful constants are in `fiberLib_Common_Macros_v9.6.h`, in particular:
@@ -199,12 +201,14 @@ iFiber = gParameterPtr->nFiber - 1;
 AllocateOneFiberLib(gFiber, iFiber, missingSegment);
 gFiber[iFiber].status = STATUS_VIRTUAL;
 ```
+
 Virtual segments are ignored by the force and contact kernels (tests `if (status[iFiber]==STATUS_VIRTUAL) return;`).
 
 **3) Three "specific" kernels in `kernel_specific.cl`** — this is the main extension point, called at every iteration:
 
 - `kernel_Specific_OneTime(param_Uint, param_Double)`: executed **only once** per iteration (grid size = 1), useful to update a counter or a global parameter (e.g. increment `param_Uint[0]`, make a target force evolve in time).
 - `kernel_Specific_Force(...)`: executed **once per segment**, after the elastic forces are computed; it adds the **external forces** specific to the case under study (traction imposed at the fiber end, gravity, etc.). In the `SimpleBending` example:
+  
   ```c
   __kernel void kernel_Specific_Force(...) {
       iSegment = (uint)(get_global_id(0));
@@ -215,6 +219,7 @@ Virtual segments are ignored by the force and contact kernels (tests `if (status
   }
   ```
 - `kernel_Specific_Position(...)`: executed **once per segment**, after time integration; it imposes the **geometric constraints** (clamping, imposed displacement or twist) by overwriting `xt`/`thetat` with a prescribed value. In `SimpleBending`, the first two nodes of the fiber are reset to their previous position, which implements the clamping:
+  
   ```c
   if ((iFiber == 0) && (i <= 1)) {
       for (k = 0; k < 3; k++) {
@@ -223,6 +228,7 @@ Virtual segments are ignored by the force and contact kernels (tests `if (status
       }
   }
   ```
+  
   The file `functions_v9.6.cl` provides a utility function `FastCheck(fiber1,i1,fiber2,i2)` that can be redefined in `kernel_specific.cl` to exclude *a priori* some fiber/node pairs from contact detection (return `SKIP_CONTACT_DETECTION`), which avoids testing contacts that cannot occur and speeds up the simulation.
 
 **4) `main.c`/`main.h`** — copied from an existing example and adapted: number of fibers, `nContactMax`, default values of `dt`, `kn`, `kt`, `bending`, `mu`, etc.
@@ -234,6 +240,7 @@ This is the simplest example: static bending of a clamped beam under a point for
 **Parameters** (`main.c`): `nFiber = 2` (one real fiber + one virtual fiber), `ls = 1.5` (segment length $l_0$), `bending = 0.1` ($B$), `nContactMax = 32·WG`, `dt = 0.1`, `kn = 1`, `kt = 0.5`, `lambda_internal = 2.8`, `mu = 0.5`.
 
 **Geometry** (`simple_bending.c`): one fiber of 20 segments, aligned with the $x$ axis:
+
 ```c
 AllocateOneFiberLib(gFiber, iFiber, 20);
 gFiber[iFiber].status = STATUS_FREE;
@@ -247,9 +254,11 @@ gFiber[iFiber].kappa1_bar[i] = 0.;                           // no natural curva
 **Specific kernels** (`kernel_specific.cl`, see I.7): a force `f_z -= 1e-4` is permanently applied to the last node of the fiber, and the first two nodes are frozen at their previous position at every time step — which implements the clamping.
 
 **Flow** (`core.c`, function `DoOneIteration`): at each iteration, elastic forces → specific force → contact detection/computation (no effect here, the fiber does not touch itself) → integration → specific geometric constraint → measurement of the max displacement. Every `10 000` iterations, the state is brought back to the host, saved, and the height of the beam tip as well as the bending energy are printed:
+
 ```c
 printf("iter = %u h = %e enrgy = %e\n", iter, gFiber[0].xt[gFiber[0].n-1][2], eBending);
 ```
+
 When `iter == iterStop`, the final beam profile is written to `profile.txt` (columns $x_i, z_i$) and the program stops.
 
 This is the skeleton to reproduce for any new case: only the initial geometry and the content of the three specific kernels change.
@@ -259,9 +268,11 @@ This is the skeleton to reproduce for any new case: only the initial geometry an
 - **`Twist`** — a single fiber aligned along $-z$, with an initial material frame `m1_bar[0] = (0,1,0)`. Used to study torsional buckling of a rod compressed/twisted at its ends (comparable to the buckling test of the article, Fig. 6): the end constraints (imposed torque, transverse blocking) are implemented in `kernel_specific.cl` (not detailed here, to be adapted to the target torque).
 
 - **`Coil`** — a single fiber initially placed on a **parametric helix**:
+  
   ```c
   x = RHelix*sin(t);  y = RHelix*cos(t);  z = pitch*t;
   ```
+  
   (function `S2PositionHelix`, parameters `gParameterPtr->RHelix`, `gParameterPtr->pitch`), the nodes being placed at constant arc length $l_0$ along this curve. The natural curvature `kappa1_bar`/`kappa2_bar` is computed node by node from the variation of $e^i$ along the helix, so that the helix is an **at-rest** (unstressed) configuration of the fiber — typically to study an already coiled strand/spring.
 
 - **`Multiple_coils`** — same geometric principle as `Coil`, but applied to *several* fibers (`SetOneFiberInitialPositions` called for each fiber), each randomly shifted (`shift` drawn with `MyRand()`) in an `lx × ly × lz` box: useful to study a bundle of fibers/springs in frictional interaction.
@@ -311,6 +322,7 @@ Each **global segment** is indexed by an integer `iSegment` (0 ≤ `iSegment` < 
 iFiber = iFiberFromSegment[iSegment];
 i      = iFromSegment[iSegment];       // 0 <= i < n[iFiber]
 ```
+
 (on the host side, the equivalent function is `NSegment(fiber*, parameter*, iFiber, i)`, which performs the inverse operation).
 
 Two work-group size constants structure all kernels:
@@ -326,31 +338,31 @@ Rather than passing each scalar individually to each kernel, two global arrays `
 
 **`param_UInt`** (excerpts):
 
-| Slot | Content |
-|---|---|
-| 0 | `iter` (iteration counter) |
-| 2 | `nFiber` |
-| 3 | `nSegment` |
-| 4 | `nContactMax` |
-| 6 | `periodic` |
-| 7 | number of actual contacts (written by `kernel_Count_Contact_Step2`) |
+| Slot  | Content                                                                                                              |
+| ----- | -------------------------------------------------------------------------------------------------------------------- |
+| 0     | `iter` (iteration counter)                                                                                           |
+| 2     | `nFiber`                                                                                                             |
+| 3     | `nSegment`                                                                                                           |
+| 4     | `nContactMax`                                                                                                        |
+| 6     | `periodic`                                                                                                           |
+| 7     | number of actual contacts (written by `kernel_Count_Contact_Step2`)                                                  |
 | 20–29 | free counters/iterations (`iter0`, `iter1`, `low_High_Eta`, `iter3`, `rRate`, `low_High_Mu`, `iter6..8`, `iterStop`) |
-| 30–39 | free flags (`flag0..flag7`, `flag_Phase`), and **39 = `flag_Reset_Contact`** (forces a rebuild of the contact list) |
+| 30–39 | free flags (`flag0..flag7`, `flag_Phase`), and **39 = `flag_Reset_Contact`** (forces a rebuild of the contact list)  |
 
 **`param_Double`** (excerpts):
 
-| Slot | Content |
-|---|---|
-| 0 | `dt` |
-| 1, 2 | `kn`, `kt` |
-| 3, 4 | `lambda`, `lambda_internal` |
-| 5, 6 | `lambda_contact_n`, `lambda_contact_t` |
-| 7 | `mu` |
-| 30 | `epsStar` (current contact-detection threshold, self-adjusted) |
-| 31 | max displacement of the iteration (output of `kernel_Max_Displacement`) |
-| 32 | displacement integrated since the last rebuild of the contact list (`Δ` of the II.5 algorithm) |
+| Slot  | Content                                                                                        |
+| ----- | ---------------------------------------------------------------------------------------------- |
+| 0     | `dt`                                                                                           |
+| 1, 2  | `kn`, `kt`                                                                                     |
+| 3, 4  | `lambda`, `lambda_internal`                                                                    |
+| 5, 6  | `lambda_contact_n`, `lambda_contact_t`                                                         |
+| 7     | `mu`                                                                                           |
+| 30    | `epsStar` (current contact-detection threshold, self-adjusted)                                 |
+| 31    | max displacement of the iteration (output of `kernel_Max_Displacement`)                        |
+| 32    | displacement integrated since the last rebuild of the contact list (`Δ` of the II.5 algorithm) |
 | 33–37 | dissipation accumulators (global viscous, stretching, normal/tangential contact, "W" operator) |
-| 50–52 | `lx, ly, lz` (used by `ComputeShift` for periodic images) |
+| 50–52 | `lx, ly, lz` (used by `ComputeShift` for periodic images)                                      |
 
 The free slots (40 and above for doubles, 30 and above for integers apart from those listed) are available to each case study for its own needs (target force, target angle, etc.), read in `kernel_Specific_*` via `param_Double[...]`/`param_UInt[...]`.
 
@@ -380,6 +392,7 @@ Execute_kernel_Compute_m1(p);            // applies theta to obtain the actual m
 
 Execute_Kernel_Max_Displacement(p);      // reduction: max displacement -> decides contact refresh
 ```
+
 This skeleton corresponds very directly to the general algorithm of the reference article (internal forces → external forces → contacts → integration → transport → geometric constraint). No kernel requires any intervention from the user **except** the two marked `[user]`, which directly call `kernel_Specific_Force`/`kernel_Specific_Position` defined in the case study's `kernel_specific.cl` (see I.7).
 
 ## II.4 Details of the internal-force kernels
@@ -413,6 +426,7 @@ iGroup = (2*iAux * (nContactMax / (WG*32))) / (nSegment/32)
 ```
 
 **b) Geometric determination + forces (narrow-phase), one thread per potential contact.**
+
 - `kernel_Contact` recomputes, for each entry of the list, the exact contact geometry (minimum distance between the two segments, each considered as a cylinder + end spheres, cf. III.4), choosing the case (sphere-sphere / cylinder-sphere / sphere-cylinder / cylinder-cylinder) giving the largest interpenetration $\delta$; from it, it deduces the normal $n$, the contact point $C$, and sets the contact state to `NEWCONTACT` or `STILLCONTACT` (depending on whether it already existed at the previous step, state `OLDCONTACT`).
 - `kernel_RemoveDoubleContact` eliminates the geometric duplicates that can appear at the junction between two consecutive segments of a same fiber (same contact point detected twice), keeping only the one with the largest interpenetration.
 - `kernel_CalculateContactForce` computes the normal force (spring-damper), updates and thresholds the tangential displacement `u_t` (Cundall–Strack + Coulomb model, see III.3), computes the force components to be distributed on the two nodes of each segment in contact (weighted by the arc-length coordinate $s_1, s_2$ of the contact point), and **accumulates them per segment** atomically in two arrays `force_per_Segment[NSegment × NFPS]` / `moment_per_Segment[...]` (each segment cannot receive more than `NFPS=128` contributions per time step).
@@ -424,10 +438,12 @@ iGroup = (2*iAux * (nContactMax / (WG*32))) / (nSegment/32)
 ## II.6 Time integration and transport of the material frame
 
 **`kernel_Integrate_and_Shift`** applies a **velocity-free Verlet** scheme (also called Störmer–Verlet) separately to positions and angles:
+
 ```
 x(t+dt) = 2x(t) - x(t-dt) + f(t)·dt²/masse
 theta(t+dt) = 2·theta(t) - theta(t-dt) + moment(t)·dt²/j
 ```
+
 (and shifts `xtm ← xt`, `thetatm ← thetat`), ignoring fibers that are not `STATUS_FREE`.
 
 **`kernel_Compute_m1bar`** then transports the reference frame $\bar m_{(1)}$ **without added twist** along the new segment: parallel transport from $e_{tm}$ to $e_t$ (function `parallel_transport` in `functions_v9.6.cl`, $x \mapsto x + (e_{tm}\times e_t)\times x$), projection to stay perpendicular to $e_t$, then renormalization. This step guarantees that $\theta_i$ indeed measures the "physical" twist added with respect to the natural geometric transport, independently of how the fiber bends.
